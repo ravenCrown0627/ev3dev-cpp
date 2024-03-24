@@ -2,8 +2,7 @@
 #include <thread>
 #include <stdexcept>
 
-#include <../ev3dev.h>
-
+#include "../lib/ev3dev.h"
 /*
 -----------------------------------------------------------------------------
 Copyright (c) 2015 Denis Demidov <dennis.demidov@gmail.com>
