@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <cstdio>
 
-#include "../ev3dev.h"
+#include "../lib/ev3dev.h"
 
 using namespace std;
 using namespace ev3dev;
