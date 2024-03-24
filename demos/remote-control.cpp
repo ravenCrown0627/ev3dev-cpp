@@ -3,6 +3,10 @@
 #include <stdexcept>
 
 #include "../lib/ev3dev.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> f4ecfdfdd54a57a28e5e2cb076a391c60a4ede98
 /*
 -----------------------------------------------------------------------------
 Copyright (c) 2015 Denis Demidov <dennis.demidov@gmail.com>
