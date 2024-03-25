@@ -55,6 +55,9 @@ control::control() :
 // Destructor
 control::~control()
 {
+  // reset();
+  stop();
+  this_thread::sleep_for(chrono::milliseconds(100));
   reset();
 }
 
@@ -123,8 +126,8 @@ void control::turn(int direction, int speed)
 // Stop the robot with the hold action
 void control::stop()
 {
-  _motor_left .set_stop_action("hold").stop_action();
-  _motor_right.set_stop_action("hold").stop_action();
+  _motor_left .set_stop_action("hold").stop();
+  _motor_right.set_stop_action("hold").stop();
 
   _state = state_idle;
 }
@@ -155,34 +158,34 @@ int control::move_in_centimeter(int speed, int distance)
   
   int time = distance / speed_in_cms * 1000;
 
-  cout <<"\n\n\nTime: " << time << " ms\n";
+  // cout <<"\n\n\nTime: " << time << " ms\n";
 
   return time;
 }
 
 int main()
 {
-  const int speed     = 180;
-  const int distance  = 20;
+  const int speed     = 800; // 300
+  // const int distance  = 35;
 
   control robot_ctrl;
 
   if (!robot_ctrl.initialized())
     return -1;
 
-  int time = robot_ctrl.move_in_centimeter(speed, distance);
-  cout << "\n###Time: " << time << " ms" << endl;
+  // int time = robot_ctrl.move_in_centimeter(speed, distance);
+  // cout << "\n###Time: " << time << " ms" << endl;
 
   // Calculate the time it takes to drive x meter
   for (int i = 0; i < 4; i++)
   {
-    robot_ctrl.drive(speed, time);
-    robot_ctrl.turn(191, 300);   // 194 degrees, 300 degrees/sec
+    robot_ctrl.drive(speed, 884);
+    robot_ctrl.turn(90, 800);   // 187 degrees, 280 degrees/sec
   }
 
-  // Allowing the robot to move further a bit to avoid slipping curve
-  robot_ctrl.drive(180, 100); // 180 degrees/sec, 0.1 seconds
+  // // Allowing the robot to move further a bit to avoid slipping curve
+  // robot_ctrl.drive(180, 100); // 180 degrees/sec, 0.1 seconds
 
-  robot_ctrl.stop();
+  // robot_ctrl.stop();
   return 0;
 }
