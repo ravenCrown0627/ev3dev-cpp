@@ -126,15 +126,31 @@ bool control::initialized() const
   return (_motor_left.connected() && _motor_right.connected());
 }
 
-int main()
+// speed is in degrees per second, distance is in cm
+void move_in_centimeter(int speed, int distance)
 {
   control robot_ctrl;
 
   if (!robot_ctrl.initialized())
     return -1;
-  
-  // Calculate the time it takes to drive x meter
-  robot_ctrl.drive(180);
 
+  double circumference = 17.8; // cm
+  double speed_in_cms = speed / 360.0 * circumference;
+  int time = distance / speed_in_cms * 1000;
+
+  robot_ctrl.drive(speed, time);
+}
+
+int main()
+{
+  // control robot_ctrl;
+
+  // if (!robot_ctrl.initialized())
+  //   return -1;
+  
+  // // Calculate the time it takes to drive x meter
+  // robot_ctrl.drive(180);
+
+  move_in_centimeter(90, 100);  // 100 cm forward at 90 speed
   return 0;
 }
