@@ -29,13 +29,19 @@ public:
   bool initialized() const;
   void terminate() { _terminate = true; }
 
-
   state _state;
+
+  // to be tested
+  void brake(int brake_time);
 
 protected:
   large_motor     _motor_left;
   large_motor     _motor_right;
   bool            _terminate;
+
+  // to record the speed of the robot
+  int             _speed_left;
+  int             _speed_right;
 };
 
 // Constructor
@@ -68,6 +74,9 @@ void control::drive(int speed, int time)
 {
   _motor_left.set_speed_sp(speed);
   _motor_right.set_speed_sp(speed);
+
+  _speed_left  = speed;
+  _speed_right = speed;
 
   _state = state_driving;
 
@@ -163,6 +172,16 @@ int control::move_in_centimeter(int speed, int distance)
   return time;
 }
 
+void control::brake(int brake_time=100)
+{
+  // Set the motors to run in the opposite direction at the brake speed
+  _motor_left.set_speed_sp(-_speed_left/2).run_forever();
+  _motor_right.set_speed_sp(-_speed_right/2).run_forever();
+
+  this_thread::sleep_for(chrono::milliseconds(brake_time));
+  control::stop();
+}
+
 int main()
 {
   const int speed     = 800; // 300
@@ -176,15 +195,16 @@ int main()
   // int time = robot_ctrl.move_in_centimeter(speed, distance);
   // cout << "\n###Time: " << time << " ms" << endl;
 
-  // Calculate the time it takes to drive x meter
-  for (int i = 0; i < 4; i++)
-  {
-    robot_ctrl.drive(speed, 884);
-    robot_ctrl.turn(90, 800);   // 187 degrees, 280 degrees/sec
-  }
+  // // Calculate the time it takes to drive x meter
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   robot_ctrl.drive(speed, 884);
+  //   robot_ctrl.turn(90, 800);   // 187 degrees, 280 degrees/sec
+  // }
 
-  // // Allowing the robot to move further a bit to avoid slipping curve
-  // robot_ctrl.drive(180, 100); // 180 degrees/sec, 0.1 seconds
+  // Allowing the robot to move further a bit to avoid slipping curve
+  robot_ctrl.drive(600, 3000); // 600 degrees/sec, 0.1 seconds
+  robot_ctrl.brake(100);
 
   // robot_ctrl.stop();
   return 0;
