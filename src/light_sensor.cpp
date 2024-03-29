@@ -52,8 +52,8 @@ int main()
     while(true)
     {
         cout << "Reflectivity: " << color1.cal_reflectivity() << endl;
-        cout << "Ambient: " << color1.cal_ambient() << endl;
-        cout << "Color: " << color1.detect_black() << endl;
+        // cout << "Ambient: " << color1.cal_ambient() << endl;
+        // cout << "Color: " << color1.detect_black() << endl;
         this_thread::sleep_for(chrono::milliseconds(2000));
     }
     return 0;
