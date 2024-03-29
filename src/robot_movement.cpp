@@ -32,16 +32,12 @@ public:
   state _state;
 
   // to be tested
-  void brake(int brake_time);
+  void brake(int brake_time=100);
 
 protected:
   large_motor     _motor_left;
   large_motor     _motor_right;
   bool            _terminate;
-
-  // to record the speed of the robot
-  int             _speed_left;
-  int             _speed_right;
 };
 
 // Constructor
@@ -51,8 +47,8 @@ protected:
 // constexpr char OUTPUT_C[] = "ev3-ports:outC"; //!< Motor port C
 // constexpr char OUTPUT_D[] = "ev3-ports:outD"; //!< Motor port D
 control::control() :
-  _motor_left(OUTPUT_B),
-  _motor_right(OUTPUT_C),
+  _motor_left(OUTPUT_A),
+  _motor_right(OUTPUT_D),
   _state(state_idle),
   _terminate(false)
 {
@@ -74,9 +70,6 @@ void control::drive(int speed, int time)
 {
   _motor_left.set_speed_sp(speed);
   _motor_right.set_speed_sp(speed);
-
-  _speed_left  = speed;
-  _speed_right = speed;
 
   _state = state_driving;
 
@@ -164,21 +157,20 @@ int control::move_in_centimeter(int speed, int distance)
 {
   double circumference = 17.8; // cm
   double speed_in_cms = speed / 360.0 * circumference;
-  
   int time = distance / speed_in_cms * 1000;
-
-  // cout <<"\n\n\nTime: " << time << " ms\n";
-
-  return time;
+  
+  control::drive(speed, time);
+  control::brake();
 }
 
-void control::brake(int brake_time=100)
+void control::brake(int brake_time)
 {
   // Set the motors to run in the opposite direction at the brake speed
-  _motor_left.set_speed_sp(-_speed_left/2).run_forever();
-  _motor_right.set_speed_sp(-_speed_right/2).run_forever();
+  _motor_left.set_speed_sp(-_motor_left.time_sp()/32).run_forever();
+  _motor_right.set_speed_sp(-_motor_right.time_sp()/32).run_forever();
 
   this_thread::sleep_for(chrono::milliseconds(brake_time));
+
   control::stop();
 }
 
@@ -194,17 +186,21 @@ int main()
 
   // int time = robot_ctrl.move_in_centimeter(speed, distance);
   // cout << "\n###Time: " << time << " ms" << endl;
+  robot_ctrl.move_in_centimeter(speed, 50);
 
+  // robot_ctrl.drive(540, 4000);
   // // Calculate the time it takes to drive x meter
   // for (int i = 0; i < 4; i++)
   // {
-  //   robot_ctrl.drive(speed, 884);
-  //   robot_ctrl.turn(90, 800);   // 187 degrees, 280 degrees/sec
+  //   robot_ctrl.drive(540, 884);
+  //   robot_ctrl.brake();
+  //   robot_ctrl.turn(187, 280);   // 187 degrees, 280 degrees/sec
+  //   robot_ctrl.brake();
   // }
 
   // Allowing the robot to move further a bit to avoid slipping curve
-  robot_ctrl.drive(600, 3000); // 600 degrees/sec, 0.1 seconds
-  robot_ctrl.brake(100);
+  // robot_ctrl.drive(speed, 3000); // 600 degrees/sec, 0.1 seconds
+  // robot_ctrl.brake();
 
   // robot_ctrl.stop();
   return 0;
