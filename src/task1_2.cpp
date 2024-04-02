@@ -26,9 +26,9 @@ int main()
   // move in a square
   for(int i = 0; i < 4; i++)
   {
-    robot_control.move_in_centimeter(360, 50);
+    robot_control.move_in_centimeter(360, 30);
     this_thread::sleep_for(chrono::milliseconds(500));
-    robot_control.turn(180, 360);
+    robot_control.turn(90, 360);
     robot_control.brake();
     this_thread::sleep_for(chrono::milliseconds(400));
   }

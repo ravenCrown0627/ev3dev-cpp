@@ -26,12 +26,12 @@ int main()
   // input speed in tacho/sec
   // input distance in cm
   // move the robot forward
-  robot_control.move_in_centimeter(360, 50);
+  robot_control.move_in_centimeter(180, 7);
 
   this_thread::sleep_for(chrono::milliseconds(3000));
 
   // move the robot backward
-  robot_control.move_in_centimeter(-360, 50);
+  robot_control.move_in_centimeter(-180, 12);
 
   return 0;
 }
