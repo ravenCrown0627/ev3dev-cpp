@@ -1010,9 +1010,9 @@ lcd::~lcd() {
 }
 
 //-----------------------------------------------------------------------------
-void lcd::fill(unsigned char pixel) {
-    if (_fb && _fbsize) {
-        memset(_fb, pixel, _fbsize);
+void lcd::fill(uint32_t pixel, const int pos) {
+    if (_fb && _llength) {
+        *((uint32_t *)(_fb + pos)) = pixel;
     }
 }
 

@@ -1548,7 +1548,7 @@ class lcd {
 
         unsigned char *frame_buffer() { return _fb; }
 
-        void fill(unsigned char pixel);
+        void fill(uint32_t pixel, const int pos);
 
     protected:
         void init();
