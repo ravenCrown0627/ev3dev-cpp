@@ -8,13 +8,14 @@ from ev3dev2.button import Button
 
 class Menu:
   def __init__(self):
-    # initialize the display and button
+    # Initialize the display and button
     self.display = Display()
     self.button = Button()
 
-    # set the mode list
+    # Set the mode list
     self.mode_list = ["Angle", "Distance", "Plot"]
 
+    #
     self.button.on_up = self.up
 
   def print_text(self, text:str, x0: int, y0:int):

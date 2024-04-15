@@ -6,7 +6,7 @@ from ev3dev2.display import Display
 import ev3dev2.fonts as fonts
 from ev3dev2.button import Button
 
-
+# Set the format of text for printing
 def print_text(text:str, x0: int, y0:int):
     """
     @brief  This function will print the text on the display
@@ -19,35 +19,38 @@ def print_text(text:str, x0: int, y0:int):
     # display.update()
 
 
+# Refresh the display
 def refresh_display():
     """
     @brief  This function will refresh the display
     """
-    global display, request, number_list, digit, input_type
+    global display, request, number_list, digit, input_type, sign
 
     display.clear()
     # Print the request for the user to enter the angle or distance
     if input_type == "angle":
-        print_text("Please enter an angle A{}: ".format(request), 0, 64)
+        print_text("Please enter A{}: ".format(request), 0, 64)
     else:
-        print_text("Please enter an distance D{}: ".format(request), 0, 64)
+        print_text("Please enter D{}: ".format(request), 0, 64)
 
     # Print the number that the user is entering
+    print_text(sign, 138, 64)                               # print the sign
     for i in range(3):
-        print_text(str(number_list[i]), 168 - 10*i, 64)
-    print_text("^", 168 - 10*int(math.log10(digit)), 74)
+        print_text(str(number_list[i]), 168 - 10*i, 64)     # print the number by digit
+    print_text("^", 168 - 10*int(math.log10(digit)), 74)    # print the mark under the digit
     display.update()
 
 
-def up(state):
+# Change digit 
+def left(state):
     """
-    @brief  This function will be called when the up button is pressed and change digit
+    @brief  This function will be called when the right button is pressed and change digit
     """
     global digit, number_list, display
     if not state:
-        # Change the digit to the next digit
+        # Change the digit to the next digit (a sign and 3 digits)
         digit *= 10
-        if digit > 100:
+        if digit > 1000:
             digit = 1
 
         # Print a mark under the digit that is being changed
@@ -56,72 +59,102 @@ def up(state):
     return True
     
 
-def right(state):
+# Plus number or change sign
+def up(state):
     """
-    @brief  This function will be called when the right button is pressed
+    @brief  This function will be called when the up button is pressed
     """
-    global number_list, digit, angle, display, input_type, distance
+    global number_list, digit, angle, display, input_type, distance, sign
 
     if not state:
-        # Set the limit of the angle or distance
-        limit = int(361) if input_type == "angle" else int(179)
+        # Change the number on the chosen digit 
+        if digit < 1000:
+            # Set the limit of the input for angle or distance
+            limit = int(181) if input_type == "angle" else int(100000)
 
-        # Aviod the user to enter a number greater than 9
-        if number_list[int(math.log10(digit))] < 9:
-            # Change the number on the chosen digit
-            number_list[int(math.log10(digit))] += 1
-            # Avoid the user to enter a total number greater than 360
-            if number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100 >= limit:
-                number_list[int(math.log10(digit))] -= 1
+            # Aviod the user to enter a number greater than 9 for single bit
+            if number_list[int(math.log10(digit))] < 9:
+                # Change the number on the chosen digit
+                number_list[int(math.log10(digit))] += 1
+                # Avoid the user to enter a total number greater than limit
+                if number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100 >= limit:
+                    number_list[int(math.log10(digit))] -= 1
 
-        # Print the changed number on the display
-        refresh_display()
+            # Print the changed number on the display
+            refresh_display()
         
-        # Calculate the angle or distance
-        if input_type == "angle":
-            angle = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+            # Calculate the angle or distance
+            if input_type == "angle":
+                if sign == "+":
+                    angle = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+                else:
+                    angle = -1 * (number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100)
+            else:
+                distance = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+        
+        # Change the sign 
         else:
-            distance = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+            if input_type == "angle":
+                sign = "-" if sign == "+" else "+"
+                refresh_display()
+            else:
+                sign = "+"
+                refresh_display()
 
     return True
 
 
-def left(state):
+# Minus number
+def down(state):
     """
     @brief  This function will be called when the left button is pressed
     """
-    global number_list, digit, angle, display, input_type, distance
+    global number_list, digit, angle, display, input_type, distance, sign
 
     if not state:
-
-        # Aviod the user to enter a number less than 0
-        if number_list[int(math.log10(digit))] > 0:
-            # Change the number on the chosen digit
-            number_list[int(math.log10(digit))] -= 1
+        # Change the number on the chosen digit
+        if digit < 1000:
+            # Aviod the user to enter a number less than 0 for single bit
+            if number_list[int(math.log10(digit))] > 0:
+                # Change the number on the chosen digit
+                number_list[int(math.log10(digit))] -= 1
         
-        # Print the changed number on the display
-        refresh_display()
+            # Print the changed number on the display
+            refresh_display()
 
-        # Calculate the angle
-        if input_type == "angle":
-            angle = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+            # Calculate the angle or distance
+            if input_type == "angle":
+                if sign == "+":
+                    angle = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+                else:
+                    angle = -1 * (number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100)
+            else:
+                distance = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
+        # Change the sign
         else:
-            distance = number_list[0] * 1 + number_list[1] * 10 + number_list[2] * 100
-    
+            if input_type == "angle":
+                sign = "-" if sign == "+" else "+"
+                refresh_display()
+            else:
+                sign = "+"
+                refresh_display()
+
     return True
 
 
-def down(state):
+# Reset
+def right(state):
     """
     @brief  This function will be called when the down button is pressed
     """
-    global number_list, angle, digit, distance
+    global number_list, angle, digit, distance, sign
     if not state:
         # Reset the number_list and angle
         number_list = [0, 0, 0]
         digit = 1
         angle = 0
         distance = 0
+        sign = "+"
         # Print the changed number on the display
         refresh_display()
     
@@ -135,13 +168,14 @@ if __name__ == '__main__':
     button = Button()
 
     # Initialize the variable
-    input_type = None
-    digit = 1 # The digit that the user is entering
-    angle = 0
-    distance = 0
-    number_list = [0, 0, 0] # for both angle and distance
-    angle_list = []
-    distance_list = []
+    input_type = None       # "angle" or "distance"
+    digit = 1               # 1 for digits, 10 for tens, 100 for hundreds, 1000 for sign (+/)
+    angle = 0               # calculated angle
+    distance = 0            # calculated distance
+    sign = "+"              # initialize the sign as positive
+    number_list = [0, 0, 0] # store the number on each digit for angle or distance
+    angle_list = []         # store all values of angle
+    distance_list = []      # store all values of distance
 
 
     # Inform the user that compile is done
@@ -182,6 +216,7 @@ if __name__ == '__main__':
 
         ############################## Request for the distance ##############################
         input_type = "distance"
+        sign = "+"
 
         # Initilize the display
         refresh_display()
@@ -200,6 +235,8 @@ if __name__ == '__main__':
         distance = 0
         number_list = [0, 0, 0]
         sleep(2)
+
+
 
     # Print out all the angles (Test purpose)
     display.clear()
