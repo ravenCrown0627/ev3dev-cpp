@@ -253,5 +253,41 @@ if __name__ == '__main__':
     display.update()
     sleep(2)
 
-
-
+    # for print the path
+    # assume start point at (0,0) -> (89,64)
+    points = [[0,0]]
+    # design function for calculate 3 points
+    # assume initial direction is positive y-axis
+    temp_angle = 0
+    for i in range(len(angle_list)):
+        # calculate the angle and distance
+        temp_angle += (angle_list[i] if angle_list[i] >= 0 else (360 + angle_list[i]))
+        temp_distance = distance_list[i]
+        # calculate the x and y, save 2 decimal
+        x = points[-1][0] + temp_distance * math.sin(math.radians(temp_angle))
+        y = points[-1][1] - temp_distance * math.cos(math.radians(temp_angle))
+        x, y = round(x, 2), round(y, 2)
+        points.append([x,y])
+    
+    # find the max and min of absolute x and y
+    max_x = max([abs(point[0]) for point in points])
+    max_y = max([abs(point[1]) for point in points])
+    # if the max of x or y is greater than 89 or 64, scale the points
+    if max_x > 89 or max_y > 64:
+        # define the scale factor
+        scale = min(89/max_x, 64/max_y) * 0.8
+        points = [[point[0]*scale, point[1]*scale] for point in points]
+    # make the start point at (89,64)
+    points = [[point[0]+89, point[1]+64] for point in points]
+    
+    # print the path
+    display.clear()
+    for i in range(len(points)-1):
+        display.line(clear_screen=False, 
+                     x1=points[i][0], y1=points[i][1],
+                     x2=points[i+1][0], y2=points[i+1][1],
+                     line_color='black', width=1)
+        sleep(0.01)
+    display.update()
+    # sleep 30s
+    sleep(30)
