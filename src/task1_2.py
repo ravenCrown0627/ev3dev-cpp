@@ -205,12 +205,5 @@ if __name__ == '__main__':
         # Reset all values for the next request
         input_angle.reset_values()
         input_distance.reset_values()
-
-    # pass the angle and distance 
-    # to an .exe file for further calculation
-    command = "./move {} {} {} {} {} {}".format(
-                angles[0], distances[0],
-                angles[1], distances[1],
-                angles[2], distances[2])
-    # call the command and stop the python script
+    command = "./move {} {} {} {} {} {}".format(angles[0], distances[0], angles[1], distances[1], angles[2], distances[2]) 
     os.system(command)
