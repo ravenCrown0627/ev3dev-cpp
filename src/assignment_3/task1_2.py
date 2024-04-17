@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from time import sleep
 import math
+import os
 
 from ev3dev2.display import Display
 import ev3dev2.fonts as fonts
@@ -205,6 +206,13 @@ if __name__ == '__main__':
         input_angle.reset_values()
         input_distance.reset_values()
 
-
+    # pass the angle and distance 
+    # to an .exe file for further calculation
+    command = "./move.exe {} {} {} {} {} {}".format(
+                angles[0], distances[0],
+                angles[1], distances[1],
+                angles[2], distances[2])
+    # call the command and stop the python script
+    os.system(command)
 
 
