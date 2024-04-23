@@ -10,13 +10,13 @@ from ev3dev2.button import Button
 # Creat a class to handle the display
 class InputManager:
     def __init__(self, input_type:str):
-        self.display = Display()  # Create a display object from ev3dev2 lib
-        self.button = Button()  # Create a button object from ev3dev2 lib
-        self.sign = "+"
-        self.digit = 1
-        self.digit_value = [0,0,0] 
-        self.input = 0
-        self.input_type = input_type
+        self.display = Display()        # Create a display object from ev3dev2 lib
+        self.button = Button()          # Create a button object from ev3dev2 lib
+        self.sign = "+"                 # Initial sign is positive
+        self.digit = 1                  # Initial digit is 1
+        self.digit_value = [0,0,0]      # Initialize the value of each digit to 0
+        self.input = 0                  # Initialize the input value to 0
+        self.input_type = input_type    # angle or distance
 
 
     # Set the location and format for printing text
@@ -47,13 +47,12 @@ class InputManager:
 
     # Calculate the angle or distance based on input values
     def calculate(self):
-        if self.input_type == "angle":
-            if self.sign == "+":
-                return self.digit_value[0] * 1 + self.digit_value[1] * 10 + self.digit_value[2] * 100
-            else:
-                return -1 * (self.digit_value[0] * 1 + self.digit_value[1] * 10 + self.digit_value[2] * 100)
-        else:
+        # Calculate when sign is positive
+        if self.sign == "+":
             return self.digit_value[0] * 1 + self.digit_value[1] * 10 + self.digit_value[2] * 100
+        # Calculate when sign is negative
+        else:
+            return -1 * (self.digit_value[0] * 1 + self.digit_value[1] * 10 + self.digit_value[2] * 100)
 
 
     # Change digit 
@@ -80,19 +79,17 @@ class InputManager:
                 if self.digit_value[int(math.log10(self.digit))] < 9:
                     # Increment to the chosen digit
                     self.digit_value[int(math.log10(self.digit))] += 1
+                    # Check if the input is over the limit
                     if self.digit_value[0] * 1 + self.digit_value[1] * 10 + self.digit_value[2] * 100 >= limit:
-                        self.digit_value[int(math.log10(self.digit))] -= 1
+                        self.digit_value[int(math.log10(self.digit))] -= 1  # Decrement the value if over limit
 
-                # Calculate the angle or distance
-                self.input = self.calculate()
+                # # Calculate the angle or distance
+                # self.input = self.calculate()
             
             # Change the sign
             else:
-                if self.input_type == "angle":
-                    self.sign = "-" if self.sign == "+" else "+"
-                else:
-                    self.sign = "+"
-            
+                self.sign = "-" if self.sign == "+" else "+"
+         
             # Refresh the display after changing number or sign
             self.refresh_display()
         
@@ -109,15 +106,12 @@ class InputManager:
                     # Decrement to the chosen digit
                     self.digit_value[int(math.log10(self.digit))] -= 1
                 
-                # Calculate the angle or distance
-                self.input = self.calculate()
+                # # Calculate the angle or distance
+                # self.input = self.calculate()
             
             # Change the sign
             else:
-                if self.input_type == "angle":
-                    self.sign = "-" if self.sign == "+" else "+"
-                else:
-                    self.sign = "+"
+                self.sign = "-" if self.sign == "+" else "+"
             
             # Refresh the display after changing number or sign
             self.refresh_display()
@@ -157,7 +151,7 @@ class InputManager:
 
 if __name__ == '__main__':
 
-    # Initialization
+    # Initialize list of each input for angle or distance
     angles = []
     distances = []
 
@@ -182,9 +176,10 @@ if __name__ == '__main__':
             input_angle.button.process()
        
         # Store the angle value and print it out
-        angles.append(input_angle.input)
+        angle = input_angle.calculate()
+        angles.append(angle)
         input_angle.display.clear()
-        input_angle.print_text("{} degree as A{} is accepted".format(input_angle.input, request), 0, 0)
+        input_angle.print_text("{} degree as A{} is accepted".format(angle, request), 0, 0)
         input_angle.display.update()
         sleep(2)
 
@@ -196,9 +191,10 @@ if __name__ == '__main__':
             input_distance.button.process()
         
         # Store the distance value and print it out
-        distances.append(input_distance.input)
+        distance = input_distance.calculate()
+        distances.append(distance)
         input_distance.display.clear()
-        input_distance.print_text("{} cm as D{} is accepted".format(input_distance.input, request), 0, 0)
+        input_distance.print_text("{} cm as D{} is accepted".format(distance, request), 0, 0)
         input_distance.display.update()
         sleep(2)
 
