@@ -53,10 +53,14 @@ int main(int argc, char* argv[])
 
     // move accroding to the value of the arguments
     for(int i = 0; i < sizeof(DISTANCE) / sizeof(int); i++) {
-        robot_control.turn(ANGLE[i] * 2, 360);
+        robot_control.turn(ANGLE[i] * 2, 180);
         robot_control.brake();
         this_thread::sleep_for(chrono::milliseconds(400));
-        robot_control.move_in_centimeter(360, DISTANCE[i]);
+        if (DISTANCE[i] < 0) {
+            robot_control.move_in_centimeter(-360, -1*DISTANCE[i]);
+        } else {
+            robot_control.move_in_centimeter(360, DISTANCE[i]);
+        }
         this_thread::sleep_for(chrono::milliseconds(500));
     }
 
