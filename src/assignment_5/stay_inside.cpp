@@ -32,7 +32,7 @@ int main()
   // randomize the initial direction
   // using time seed
   srand(time(0));
-  robot.turn_dc(rand() % 360 * 2, TURN_SPEED);
+  robot.turn_dc(rand() % 360, TURN_SPEED);
 
   // loop forever, stay inside the rectangle
   while (true)
@@ -45,7 +45,7 @@ int main()
     {
       robot.brake();
       // turn the robot at a degree between 90 to 270
-      robot.turn_dc((rand() % 180 + 90)*2, TURN_SPEED);
+      robot.turn_dc(rand() % 180 + 90, TURN_SPEED);
     }
   }
 }
