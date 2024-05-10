@@ -122,3 +122,29 @@ void control::brake(int brake_time)
 
   control::stop();
 }
+
+void control::turn_dc(int direction, int duty_cycle)
+{
+  if (_state != state_idle)
+    stop();
+
+  if (direction == 0)
+    return;
+
+  direction *= 2;
+
+  _state = state_turning;
+
+  // Reset the motor position
+  _motor_left .set_position_sp(0);
+  _motor_right.set_position_sp(0);
+
+  // Run the motors to the relative position
+  _motor_left. set_position_sp( direction).set_duty_cycle_sp(duty_cycle).run_to_rel_pos();
+  _motor_right.set_position_sp(-direction).set_duty_cycle_sp(duty_cycle).run_to_rel_pos();
+
+  while (_motor_left.state().count("running") || _motor_right.state().count("running"))
+    this_thread::sleep_for(chrono::milliseconds(10));
+
+  _state = state_idle;
+}

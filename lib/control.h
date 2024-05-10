@@ -59,5 +59,6 @@ public:
 
   // to be tested
   void brake(int brake_time=100);
+  void turn_dc(int direction, int duty_cycle);
   
 };
