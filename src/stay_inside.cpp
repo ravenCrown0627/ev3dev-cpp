@@ -26,6 +26,9 @@ int main()
     return -1;
   }
 
+  // initiliaze the color sensor to ensure the reading is valid
+  color1.reflected_light_intensity();
+
   // wait 3 seconds for start
   this_thread::sleep_for(chrono::milliseconds(3000));
   

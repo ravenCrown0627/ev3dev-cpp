@@ -135,13 +135,16 @@ void control::turn_dc(int direction, int duty_cycle)
 
   _state = state_turning;
 
+  // Calculate turn speed
+  int speed = _motor_left.max_speed() * duty_cycle / 100;
+
   // Reset the motor position
   _motor_left .set_position_sp(0);
   _motor_right.set_position_sp(0);
 
   // Run the motors to the relative position
-  _motor_left. set_position_sp( direction).set_duty_cycle_sp(duty_cycle).run_to_rel_pos();
-  _motor_right.set_position_sp(-direction).set_duty_cycle_sp(duty_cycle).run_to_rel_pos();
+  _motor_left. set_position_sp( direction).set_speed_sp(speed).run_to_rel_pos();
+  _motor_right.set_position_sp(-direction).set_speed_sp(speed).run_to_rel_pos();
 
   while (_motor_left.state().count("running") || _motor_right.state().count("running"))
     this_thread::sleep_for(chrono::milliseconds(10));
