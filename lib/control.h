@@ -19,9 +19,10 @@ enum state
 class control
 {
 public:
-  large_motor     _motor_left;
-  large_motor     _motor_right;
-  bool            _terminate;
+  large_motor       _motor_left;
+  large_motor       _motor_right;
+  ultrasonic_sensor _ultrasonic_s;
+  bool              _terminate;
 
   // Constructor
   // ev3dev.h:L86
@@ -32,6 +33,7 @@ public:
   control() :
     _motor_left(OUTPUT_A),
     _motor_right(OUTPUT_D),
+    _ultrasonic_s(INPUT_2),
     _state(state_idle),
     _terminate(false)
   {
@@ -60,5 +62,4 @@ public:
   // to be tested
   void brake(int brake_time=100);
   void turn_dc(int direction, int duty_cycle);
-  
 };

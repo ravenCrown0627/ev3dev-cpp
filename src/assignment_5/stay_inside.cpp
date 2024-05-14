@@ -14,7 +14,7 @@ int main()
 {
   // speed in duty cycle
   int FORWARD_SPEED = 90;
-  int TURN_SPEED = 40;
+  int TURN_SPEED = 50;
 
   control         robot;
   color_sensor    color1(INPUT_1);
@@ -25,6 +25,9 @@ int main()
     this_thread::sleep_for(chrono::milliseconds(3000));
     return -1;
   }
+
+  // initiliaze the color sensor to ensure the reading is valid
+  color1.reflected_light_intensity();
 
   // wait 3 seconds for start
   this_thread::sleep_for(chrono::milliseconds(3000));
@@ -44,6 +47,8 @@ int main()
     if(color1.reflected_light_intensity() < 5)
     {
       robot.brake();
+      // reverse for a short distance
+      robot.move_in_centimeter(-FORWARD_SPEED * 5, 10);
       // turn the robot at a degree between 90 to 270
       robot.turn_dc(rand() % 180 + 90, TURN_SPEED);
     }
