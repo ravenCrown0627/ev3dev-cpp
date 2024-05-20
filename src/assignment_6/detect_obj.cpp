@@ -4,31 +4,6 @@
 using namespace ev3dev;
 using namespace std;
 
-/*
-Port A = left motor
-Port D = right motor
-Port 1 = color sensor
-*/
-
-// // Function to monitor the distance and control the robot's movement
-// void monitor_distance(control& robot, ev3dev::ultrasonic_sensor& ultrasonic_s, ev3dev::color_sensor& color_s,
-//                       const int max_obj_dist, const int forward_speed) {
-//     while (true) {
-//         if (ultrasonic_s.distance_centimeters() < max_obj_dist) {
-//             robot._motor_left.set_duty_cycle_sp(forward_speed).run_direct();
-//             robot._motor_right.set_duty_cycle_sp(forward_speed).run_direct();
-
-//             // if the robot is outside the line
-//             if(color_s.reflected_light_intensity() < 5)
-//             {
-//                 robot.brake();
-//                 // reverse for a short distance
-//                 robot.move_in_centimeter(-forward_speed * 5, 10);
-//             }
-//         }
-//     }
-// }
-
 int main()
 {
     // speed in duty cycle
@@ -70,12 +45,10 @@ int main()
             // reverse for a short distance
             robot.move_in_centimeter(-FORWARD_SPEED * 5, 10);
             // turn the robot at a degree between 90 to 270
+            // the modification is at the control.cpp and control.h
             robot.turn_dc(rand() % 180 + 90, TURN_SPEED);
         }
-        
     }
-
-    // monitor_thread.join();
 
     return 0;
 }
