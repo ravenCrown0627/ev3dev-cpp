@@ -59,7 +59,7 @@ private:
     state initial_action();
     state navigate(int duty_cycle);
     state attack(int duty_cycle);
-    void border_detected();
+    state border_detected(int duty_cycle);
 
     // Utility functions
     void drive(int speed, int time = 0);

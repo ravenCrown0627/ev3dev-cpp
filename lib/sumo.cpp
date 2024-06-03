@@ -24,7 +24,7 @@ void Sumo::run_state_machine() {
             // border detected
             case state_border_detected:
                 // Currently no action
-                _state = state_idle;
+                _state = border_detected(BORDER_AVOID_DUTY_CYCLE);
                 break;
             case exit:
                 return;
@@ -125,13 +125,13 @@ Sumo::state Sumo::attack(int duty_cycle) {
     return state_border_detected;
 }
 
-void Sumo::border_detected(int duty_cycle) {
+Sumo::state Sumo::border_detected(int duty_cycle) {
     if (_state != state_idle)
         brake();
 
     _motor_left.set_duty_cycle_sp(-duty_cycle).run_direct();
     _motor_right.set_duty_cycle_sp(-duty_cycle).run_direct();
-    thread::sleep_for(chrono::milliseconds(2000));
+    this_thread::sleep_for(chrono::milliseconds(2000));
 
     // move backward with the given duty_cycle
     while (_touch_s.is_pressed()) {
@@ -139,7 +139,7 @@ void Sumo::border_detected(int duty_cycle) {
         _motor_right.set_duty_cycle_sp(-duty_cycle).run_direct();
     }
 
-    return state_navigate;      
+    return state_navigate;   
 }
 
 // Drive the robot forward or backward with certain time
