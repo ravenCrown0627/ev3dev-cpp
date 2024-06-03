@@ -41,6 +41,7 @@ Sumo::state Sumo::initial_action() {
     // Reset the motor position
     _motor_left .set_position_sp(0);
     _motor_right.set_position_sp(0);
+    _medium_motor.set_position_sp(0);
 
     // Run the motors to the relative position
     _motor_left. set_position_sp( 180).set_speed_sp(NAV_TURNING_DUTY_CYCLE).run_to_rel_pos();
@@ -49,12 +50,12 @@ Sumo::state Sumo::initial_action() {
     // While the robot is turning
     while (_motor_left.state().count("running") || 
                 _motor_right.state().count("running")) {
-        // Push down the medium motor
-        _medium_motor.set_speed_sp(1000).run_forever();
         this_thread::sleep_for(chrono::milliseconds(10));
     }
 
     brake();
+    // Push down the medium motor
+    _medium_motor.set_position_sp(720).set_speed_sp(1000).run_to_rel_pos();
     // Stop the medium motor
     _medium_motor.stop();
     // This need to do experiment to get the optimal speed and time to 
