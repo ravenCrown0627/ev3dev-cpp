@@ -44,8 +44,8 @@ Sumo::state Sumo::initial_action() {
     _medium_motor.set_position_sp(0);
 
     // Run the motors to the relative position
-    _motor_left. set_position_sp( 360).set_speed_sp(80).run_to_rel_pos();
-    _motor_right.set_position_sp(-360).set_speed_sp(80).run_to_rel_pos();
+    _motor_left. set_position_sp( 270).set_speed_sp(500).run_to_rel_pos();
+    _motor_right.set_position_sp(-270).set_speed_sp(500).run_to_rel_pos();
 
     // While the robot is turning
     while (_motor_left.state().count("running") || 
