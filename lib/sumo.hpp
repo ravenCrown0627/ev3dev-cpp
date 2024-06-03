@@ -44,7 +44,7 @@ public:
         _motor_right(OUTPUT_D),
         _medium_motor(OUTPUT_B),
         _color_s(INPUT_1),
-        // _touch_s(INPUT_2),
+        _touch_s(INPUT_2),
         _ultrasonic_s(INPUT_3),
         _state(state_idle) {};
     ~Sumo() {
