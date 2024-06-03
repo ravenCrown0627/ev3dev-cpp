@@ -29,7 +29,7 @@ public:
     medium_motor      _medium_motor;
     /* Sensor */
     color_sensor      _color_s;
-    // touch_sensor      _touch_s;
+    touch_sensor      _touch_s;
     ultrasonic_sensor _ultrasonic_s;
     state             _state;
 
@@ -37,6 +37,7 @@ public:
     const int NAV_TURNING_DUTY_CYCLE = 40;
     const int ATTACK_FORWARD_DUTY_CYCLE = 90;
     const int OBJ_DISTANCE = 30;    // 30 cm
+    const int BORDER_AVOID_DUTY_CYCLE = 90;
 
     Sumo() : 
         _motor_left(OUTPUT_A),
