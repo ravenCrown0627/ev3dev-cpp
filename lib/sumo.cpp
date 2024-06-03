@@ -129,14 +129,16 @@ Sumo::state Sumo::border_detected(int duty_cycle) {
     if (_state != state_idle)
         brake();
 
-    _motor_left.set_duty_cycle_sp(-duty_cycle).run_direct();
-    _motor_right.set_duty_cycle_sp(-duty_cycle).run_direct();
+    _motor_left.set_duty_cycle_sp(duty_cycle).run_direct();
+    _motor_right.set_duty_cycle_sp(duty_cycle).run_direct();
+
+    // the 500 need to be experiment to get the optimal time to move backward
     this_thread::sleep_for(chrono::milliseconds(500));
 
     // move backward with the given duty_cycle
     while (_touch_s.is_pressed()) {
-        _motor_left.set_duty_cycle_sp(-duty_cycle).run_direct();
-        _motor_right.set_duty_cycle_sp(-duty_cycle).run_direct();
+        _motor_left.set_duty_cycle_sp(duty_cycle).run_direct();
+        _motor_right.set_duty_cycle_sp(duty_cycle).run_direct();
     }
 
     return state_navigate;   
