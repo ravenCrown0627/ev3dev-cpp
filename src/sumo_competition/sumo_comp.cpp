@@ -8,7 +8,7 @@ int main()
 {
     // speed in duty cycle
     int FORWARD_SPEED = 90;
-    int TURN_SPEED    = 50;
+    int TURN_SPEED    = 40;
     int OBJ_DISTANCE  = 30; // 30 cm
 
     control         robot;
@@ -30,22 +30,25 @@ int main()
     // randomize the initial direction
     // using time seed
     srand(time(0));
+    // Initial state
+    // Push down the 
+    robot.push_down();
     robot.turn_dc(rand() % 360, TURN_SPEED);
 
     // loop forever, stay inside the rectangle
     while (true)
     {
-        robot._motor_left.set_duty_cycle_sp(FORWARD_SPEED).run_direct();
-        robot._motor_right.set_duty_cycle_sp(FORWARD_SPEED).run_direct();
-
+        robot._motor_left.set_duty_cycle_sp(-FORWARD_SPEED).run_direct();
+        robot._motor_right.set_duty_cycle_sp(-FORWARD_SPEED).run_direct();
         // if the robot is outside the line
-        if(color_s.reflected_light_intensity() < 5)
+        if(color_s.reflected_light_intensity() <= 6)
         {
             robot.brake();
             // reverse for a short distance
-            robot.move_in_centimeter(-FORWARD_SPEED * 5, 10);
+            robot.move_in_centimeter(FORWARD_SPEED * 5, 10);
             // turn the robot at a degree between 90 to 270
             // the modification is at the control.cpp and control.h
+            robot.brake();
             robot.turn_dc(rand() % 180 + 90, TURN_SPEED);
         }
     }

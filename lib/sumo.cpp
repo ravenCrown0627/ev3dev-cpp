@@ -38,29 +38,24 @@ void Sumo::run_state_machine() {
 Sumo::state Sumo::initial_action() {
     _state = state_intial;
 
-    // Reset the motor position
-    _motor_left .set_position_sp(0);
-    _motor_right.set_position_sp(0);
+    // // Reset the motor position
+    // _motor_left .set_position_sp(0);
+    // _motor_right.set_position_sp(0);
     _medium_motor.set_position_sp(0);
-
-    // Run the motors to the relative position
-    _motor_left. set_position_sp( 270).set_speed_sp(500).run_to_rel_pos();
-    _motor_right.set_position_sp(-270).set_speed_sp(500).run_to_rel_pos();
-
-    // While the robot is turning
-    while (_motor_left.state().count("running") || 
-                _motor_right.state().count("running")) {
-        this_thread::sleep_for(chrono::milliseconds(10));
-    }
-
-    brake();
-    // Push down the medium motor
     _medium_motor.set_position_sp(720).set_speed_sp(1000).run_to_rel_pos();
+    // the 500 need to be experiment to get the optimal time to move backward
+    this_thread::sleep_for(chrono::milliseconds(200));
     // Stop the medium motor
     _medium_motor.stop();
-    // This need to do experiment to get the optimal speed and time to 
-    // arrive nearby the center of the arena
-    drive(-350, 1000);
+
+    // // Run the motors to the relative position
+    // _motor_left. set_position_sp( 500).set_speed_sp(800).run_to_rel_pos();
+    // _motor_right.set_position_sp(-500).set_speed_sp(800).run_to_rel_pos();
+    _motor_left.set_duty_cycle_sp(90).run_direct();
+    _motor_right.set_duty_cycle_sp(90).run_direct();
+
+    // the 500 need to be experiment to get the optimal time to move backward
+    this_thread::sleep_for(chrono::milliseconds(300));
 
     return state_navigate;
 }
@@ -218,4 +213,23 @@ void Sumo::reset() {
     _motor_right.reset();
 
   _state = exit;
+}
+
+// speed is in degrees per second, distance is in cm
+void Sumo::move_in_centimeter(int speed, int distance)
+{
+  int abs_speed;
+
+  if (speed < 0) {
+    abs_speed = -speed;
+  } else {
+    abs_speed = speed;
+  }
+
+  double circumference = 17.8; // cm
+  double speed_in_cms = abs_speed / 360.0 * circumference;
+  int time = distance / speed_in_cms * 1000;
+  
+  Sumo::drive(speed, time);
+  Sumo::brake();
 }

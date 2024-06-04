@@ -66,7 +66,7 @@ private:
     void brake(int brake_time = 100);
     void stop();
     void reset();
-    int move_in_centimeter(int speed, int distance);
+    void move_in_centimeter(int speed, int distance);
     void turn(int direction, int speed);
 
     void turn_at_own_axis(int duty_cycle = 40);
