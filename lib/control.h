@@ -1,4 +1,6 @@
 // this file contains the declaration of the control class
+#ifndef CONTROL_H
+#define CONTROL_H
 
 #include "ev3dev.h"
 
@@ -21,6 +23,7 @@ class control
 public:
   large_motor       _motor_left;
   large_motor       _motor_right;
+  medium_motor      _medium_motor;
   ultrasonic_sensor _ultrasonic_s;
   bool              _terminate;
 
@@ -33,11 +36,10 @@ public:
   control() :
     _motor_left(OUTPUT_A),
     _motor_right(OUTPUT_D),
-    _ultrasonic_s(INPUT_2),
+    _medium_motor(OUTPUT_B),
+    _ultrasonic_s(INPUT_3),
     _state(state_idle),
-    _terminate(false)
-  {
-  }
+    _terminate(false) {}
 
   // Destructor
   ~control()
@@ -62,4 +64,9 @@ public:
   // to be tested
   void brake(int brake_time=100);
   void turn_dc(int direction, int duty_cycle);
+
+  // for medium motor
+  void push_down();
 };
+
+#endif

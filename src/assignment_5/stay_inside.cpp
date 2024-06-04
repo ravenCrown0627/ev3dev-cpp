@@ -40,15 +40,15 @@ int main()
   // loop forever, stay inside the rectangle
   while (true)
   {
-    robot._motor_left.set_duty_cycle_sp(FORWARD_SPEED).run_direct();
-    robot._motor_right.set_duty_cycle_sp(FORWARD_SPEED).run_direct();
+    robot._motor_left.set_duty_cycle_sp(-60).run_direct();
+    robot._motor_right.set_duty_cycle_sp(-60).run_direct();
 
     // if the robot is outside the line
-    if(color1.reflected_light_intensity() < 5)
+    if(color1.reflected_light_intensity() <= 6)
     {
       robot.brake();
       // reverse for a short distance
-      robot.move_in_centimeter(-FORWARD_SPEED * 5, 10);
+      robot.move_in_centimeter(FORWARD_SPEED * 5, 10);
       // turn the robot at a degree between 90 to 270
       robot.turn_dc(rand() % 180 + 90, TURN_SPEED);
     }

@@ -143,16 +143,24 @@ void control::turn_dc(int direction, int duty_cycle)
   _motor_right.set_position_sp(0);
 
   // Run the motors to the relative position
-  _motor_left. set_position_sp( direction).set_speed_sp(speed).run_to_rel_pos();
-  _motor_right.set_position_sp(-direction).set_speed_sp(speed).run_to_rel_pos();
+  _motor_left. set_position_sp(-direction).set_speed_sp(speed).run_to_rel_pos();
+  _motor_right.set_position_sp( direction).set_speed_sp(speed).run_to_rel_pos();
 
   while (_motor_left.state().count("running") || _motor_right.state().count("running")) {
     if (_ultrasonic_s.distance_centimeters() < 30) {
       brake();
       return;
     }
-      this_thread::sleep_for(chrono::milliseconds(10));
+        
+    this_thread::sleep_for(chrono::milliseconds(10));
   }
 
   _state = state_idle;
+}
+
+void control::push_down()
+{
+  _medium_motor.set_speed_sp(1000).run_forever();
+  this_thread::sleep_for(chrono::milliseconds(500));
+  _medium_motor.stop();
 }
