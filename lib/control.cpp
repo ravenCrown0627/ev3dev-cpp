@@ -5,28 +5,67 @@
 // The unit of time is in milliseconds
 void control::drive(int speed, int time)
 {
-  _motor_left.set_speed_sp(speed);
-  _motor_right.set_speed_sp(speed);
+    _motor_left.set_speed_sp(speed);
+    _motor_right.set_speed_sp(speed);
 
-  _state = state_driving;
+    _state = state_driving;
+    _motor_right.run_direct();
 
-  _motor_right.run_direct();
-  if (time > 0)
-  {
-    _motor_left .set_time_sp(time).run_timed();
-    _motor_right.set_time_sp(time).run_timed();
+    if (time > 0 && speed > 0) {
+        _motor_left .set_time_sp(time).run_timed();
+        _motor_right.set_time_sp(time).run_timed();
 
-    while (_motor_left.state().count("running") || 
-              _motor_right.state().count("running"))
-      this_thread::sleep_for(chrono::milliseconds(10));
+        bool is_obstacle = true;
+        int obstacle_distance_idx = 0;
+        int no_obstacle_distance_idx = 0;
 
-    _state = state_idle;
-  }
-  else
-  {
-    _motor_left.run_forever();
-    _motor_right.run_forever();
-  }
+        // Get a timestamp of the current time
+        auto start = chrono::system_clock::now();
+        while (_motor_left.state().count("running") || _motor_right.state().count("running")) {
+            if (_ultrasonic_s.distance_centimeters() > 30) {
+                if (is_obstacle) {
+                    // Get a timestamp of the current time
+                    auto end = chrono::system_clock::now();
+                    chrono::duration<double> elapsed_seconds = end - start;
+                    // Count the time difference between the time elapsed and the time set
+                    int time_diff = time - elapsed_seconds.count() * 1000 - (obstacle_distance_idx * 100);
+                    _obstacle_distance[obstacle_distance_idx] = elapsed_seconds.count() * 1000;
+                    is_obstacle = false;
+                    _number_of_exit++;
+                    sound::beep("", true);
+                    stop();
+                    _motor_left .set_time_sp(time_diff).run_timed();
+                    _motor_right.set_time_sp(time_diff).run_timed();
+                }
+            } else {
+                if (!is_obstacle) {
+                    is_obstacle = true;
+                    auto end = chrono::system_clock::now();
+                    chrono::duration<double> elapsed_seconds = end - start;
+                    int time_diff = _obstacle_distance[obstacle_distance_idx] - (time - elapsed_seconds.count() * 1000);
+                    _no_obstacle_distance[no_obstacle_distance_idx] = elapsed_seconds.count() * 1000;
+                    // Change the pointer to point to next element in the array
+                    obstacle_distance_idx++;
+                    no_obstacle_distance_idx++;
+                }
+            }
+
+            this_thread::sleep_for(chrono::milliseconds(100));
+        }
+
+        _state = state_idle;
+    } else if (time > 0 && speed < 0) {
+        _motor_left .set_time_sp(time).run_timed();
+        _motor_right.set_time_sp(time).run_timed();
+
+        while (_motor_left.state().count("running") || _motor_right.state().count("running"))
+            this_thread::sleep_for(chrono::milliseconds(10));
+
+        _state = state_idle;
+    } else {
+        _motor_left.run_forever();
+        _motor_right.run_forever();
+    }
 }
 
 // Turn the robot either left or right
@@ -41,26 +80,27 @@ void control::drive(int speed, int time)
 //    Theta_robot : Angle of the robot needed to turn
 void control::turn(int direction, int speed)
 {
-  if (_state != state_idle)
-    stop();
+    if (_state != state_idle)
+        stop();
 
-  if (direction == 0)
-    return;
+    if (direction == 0)
+        return;
 
-  _state = state_turning;
+    _state = state_turning;
+    
+    direction *= 2;
+    // Reset the motor position
+    _motor_left .set_position_sp(0);
+    _motor_right.set_position_sp(0);
 
-  // Reset the motor position
-  _motor_left .set_position_sp(0);
-  _motor_right.set_position_sp(0);
+    // Run the motors to the relative position
+    _motor_left. set_position_sp( direction).set_speed_sp(speed).run_to_rel_pos();
+    _motor_right.set_position_sp(-direction).set_speed_sp(speed).run_to_rel_pos();
 
-  // Run the motors to the relative position
-  _motor_left. set_position_sp( direction).set_speed_sp(speed).run_to_rel_pos();
-  _motor_right.set_position_sp(-direction).set_speed_sp(speed).run_to_rel_pos();
+    while (_motor_left.state().count("running") || _motor_right.state().count("running"))
+        this_thread::sleep_for(chrono::milliseconds(10));
 
-  while (_motor_left.state().count("running") || _motor_right.state().count("running"))
-    this_thread::sleep_for(chrono::milliseconds(10));
-
-  _state = state_idle;
+    _state = state_idle;
 }
 
 // Stop the robot with the hold action
@@ -69,7 +109,9 @@ void control::stop()
   _motor_left .set_stop_action("hold").stop();
   _motor_right.set_stop_action("hold").stop();
 
-  _state = state_idle;
+  this_thread::sleep_for(chrono::milliseconds(100));
+
+//   _state = state_idle;
 }
 
 // Reset the status of the motor to the default parameter
@@ -95,21 +137,18 @@ int control::move_in_centimeter(int speed, int distance)
 {
   int abs_speed;
 
-  if (speed < 0)
-  {
+  if (speed < 0) {
     abs_speed = -speed;
-  }
-  else
-  {
+  } else {
     abs_speed = speed;
   }
 
   double circumference = 17.8; // cm
   double speed_in_cms = abs_speed / 360.0 * circumference;
   int time = distance / speed_in_cms * 1000;
+  _total_time = time;
   
   control::drive(speed, time);
-  control::brake();
 }
 
 void control::brake(int brake_time)
@@ -120,7 +159,9 @@ void control::brake(int brake_time)
 
   this_thread::sleep_for(chrono::milliseconds(brake_time));
 
-  control::stop();
+  stop();
+
+  _state = state_idle;
 }
 
 void control::turn_dc(int direction, int duty_cycle)

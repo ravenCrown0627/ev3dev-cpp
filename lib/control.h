@@ -26,7 +26,10 @@ public:
   medium_motor      _medium_motor;
   ultrasonic_sensor _ultrasonic_s;
   bool              _terminate;
-
+  int               _obstacle_distance[10] = {0};
+  int               _no_obstacle_distance[10] = {0};
+  int               _number_of_exit = 0;
+  int               _total_time = 0; 
   // Constructor
   // ev3dev.h:L86
   // constexpr char OUTPUT_A[] = "ev3-ports:outA"; //!< Motor port A
@@ -61,7 +64,6 @@ public:
 
   state _state;
 
-  // to be tested
   void brake(int brake_time=100);
   void turn_dc(int direction, int duty_cycle);
 
